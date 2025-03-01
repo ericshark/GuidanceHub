@@ -18,12 +18,15 @@ app.get('/', (req, res)=>{
 app.get('/about', (req, res)=>{
     res.render('about')
 })
-app.get('/ejs', (req, res)=>{
+app.get('/home', (req, res)=>{
     res.render('index')
 })
 
 app.get('/about-us',(req, res)=>{
     res.redirect('/about')
+})
+app.get('/contact',(req,res)=>{
+    res.render('contact')
 })
 app.get('/create', (req, res)=>{
     res.render('create')

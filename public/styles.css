@@ -61,6 +61,11 @@ nav ul li a {
   font-weight: 400;
   transition: color 0.3s ease;
 }
+.login-btn{
+  background-color: #6a0dad;
+  padding: .5em .7em;
+  border-radius: 5px;
+}
 
 nav ul li a:hover {
   color: #fff;
@@ -76,6 +81,8 @@ nav ul li a:hover {
   position: relative;
   z-index: 2;
 }
+
+
 
 .content-container {
   background: rgba(255, 255, 255, 0.1); /* Glassmorphism effect */
@@ -106,22 +113,48 @@ p {
 }
 
 /* Contact Form */
-.contact-form {
+.contact-form, .user-information, .login-info {
   display: flex;
   flex-direction: column;
   gap: 1em;
   margin-top: 2em;
 }
+.login-info{
+  text-align: start;
+}
+.login-info a, .new-user a{
+  text-decoration: none;
+  color:#e9caff
+}
+.login-info a:hover, .new-user a:hover{
+  color:#e0e0e0
+}
 
-.contact-form input, .contact-form textarea {
+.user-information{
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.contact-form input, .contact-form textarea, .user-information input, .user-information textarea, .login-info input {
   padding: 0.8em;
   border: none;
   border-radius: 0.5em;
   font-size: 1em;
 }
+#begin{
+  display: inline-block;
+  color: white;
+  background-color: #6a0dad;
+  padding: 1em;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  margin-top: 10px;
+}
 
- button {
-  padding: 0.8em 2em;
+button {
+  padding: 1em 2.5em;
+  font-size: 1em;
   background-color: #6a0dad; /* Purple like "Davon" buttons */
   color: white;
   border: none;
@@ -129,9 +162,10 @@ p {
   font-weight: 700;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  margin-top: 14px;
 }
 
-.contact-form button:hover {
+.contact-form button:hover, .user-information button:hover {
   background-color: #7a2dbe;
 }
 
@@ -140,22 +174,158 @@ p {
   text-align: left;
 }
 
-.contact-info p {
+.contact-info p, .user-information p {
   margin: 0.5em 0;
+}
+.new-user{
+  margin-top: 10px;
+  font-size: 1em;
+}
+.user-information {
+  background: #d9d9d9;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  text-align: left;
+}
+
+/* Choice Container (Category) */
+.choice-container {
+  margin-bottom: 20px;
+}
+
+.choice-container label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #34495e;
+}
+
+.choice-container select,
+.choice-container input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  color: #333;
+}
+
+.choice-container select:focus,
+.choice-container input[type="text"]:focus {
+  border-color: #3498db;
+  outline: none;
+}
+
+.custom-input {
+  margin-top: 10px;
+}
+
+/* Radio Container (Advice Style) */
+/* Radio Container (Advice Style) */
+.radio-container {
+  margin-bottom: 15px; /* Reduced from 20px */
+}
+
+.radio-container p {
+  font-weight: bold;
+  margin-bottom: 5px; /* Reduced from 10px */
+  color: #34495e;
+  text-align: left;
+}
+
+.radio-options {
+  display: flex;
+  flex-direction: row; /* Changed to horizontal */
+  gap: 15px; /* Space between options */
+  flex-wrap: wrap; /* Wraps if needed on small screens */
+}
+.color{
+  color:black
+}
+
+.radio-options input[type="radio"] {
+  margin-right: 4px; /* Tight spacing */
+}
+
+.radio-options label {
+  font-size: 0.95rem; /* Slightly smaller */
+  color: #555;
+  cursor: pointer;
+}
+/* Submit Button */
+.submit-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background-color: #3498db;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.submit-btn:hover {
+  background-color: #2980b9;
+}
+
+/* Questions Container */
+#questions-container div {
+  margin-bottom: 15px;
+}
+
+#questions-container p {
+  font-weight: bold;
+  color: #34495e;
+  margin-bottom: 5px;
+}
+
+#questions-container input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+/* Advice Container */
+#advice-container {
+  margin-top: 20px;
+}
+
+#advice-container h2 {
+  font-size: 1.5rem;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+#advice-container p {
+  text-align: left;
+  background: #ecf0f1;
+  padding: 15px;
+  border-radius: 4px;
 }
 
 /* Footer */
 footer {
+  display: block;
+  width: max-content; /* Set a specific width */
   text-align: center;
   padding: 1em;
-  background: rgba(0, 0, 0, 0.8);
-  position: relative;
+  background: rgba(0, 0, 0, 0.4);
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: 0 auto; /* Centers it horizontally */
   z-index: 2;
 }
 
 footer p {
   font-size: 0.9em;
   color: #ccc;
+  margin: 0;
 }
 
 /* Media Queries for Responsiveness */

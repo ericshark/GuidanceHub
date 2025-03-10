@@ -8,7 +8,7 @@ const OpenAI = require('openai'); // Add OpenAI package
 app.set('view engine', 'ejs');
 
 // Log the API key (for debugging, remove in production)
-console.log('OpenAI Key:', process.env.OPENAI_API_KEY);
+console.log('OpenAI Key:', process.env.KEY);
 
 // Initialize OpenAI with API key from .env
 const openai = new OpenAI({

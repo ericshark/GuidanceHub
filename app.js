@@ -7,6 +7,7 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const session = require('express-session');
 const mongoose = require('mongoose');
+const MongoStore = require('connect-mongo'); // This is correct
 
 // Set view engine
 app.set('view engine', 'ejs');

@@ -18,6 +18,21 @@ mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .catch(err => console.error('MongoDB connection error:', err));
 
 
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your-session-secret',
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGO_URI || 'mongodb://localhost:27017/guidancehub',
+    collectionName: 'sessions'
+  }),
+  cookie: {
+    secure: process.env.NODE_ENV === 'production', // Important for Render (HTTPS)
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
+}));
+
+
 const callbackURL = process.env.NODE_ENV === 'production'
   ? 'https://pathfinder-krpb.onrender.com'
   : 'http://localhost:3000/auth/google/callback';
@@ -39,12 +54,7 @@ passport.deserializeUser((user, done) => {
   done(null, user);
 });
 
-// Middleware
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false
-}));
+
 app.use(passport.initialize());
 app.use(passport.session());
 app.use((req, res, next) => {

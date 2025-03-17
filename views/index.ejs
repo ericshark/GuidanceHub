@@ -18,7 +18,17 @@
         <p>Get personalized advice on career, relationships, finance, and more—powered by cutting-edge AI technology.</p>
        
        
-        <a id="begin" href="/begin" >Let' Begin</a>
+        
+    <% if (!user) { %>
+
+      <a id="begin" href="/login" >Let's Begin</a>
+  
+    <% } %>
+    <% if (user) { %>
+ 
+      <a id="begin" href="/begin" >Let's Begin</a>
+    
+    <% } %>
      
       </div>
     </section>

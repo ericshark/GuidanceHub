@@ -10,42 +10,66 @@
     <!-- Navigation -->
     <%- include('partials/nav') %>
 
-    <!-- Contact Section -->
-    <section class="contact">
+   <section class="contact">
       <div class="content-container">
-        <h1>Fill in Information</h1>
-        <p>Enter details to receive personalized advice</p>
+        <div class="intro-section" id="intro-section">
+          <h1>Fill in Information</h1>
+
+        </div>
 
         <!-- Initial Form -->
         <form id="initial-form" class="user-information">
-          <!-- Category Selection -->
+          <!-- Topic Input -->
           <div class="choice-container">
-            <label for="category">Life Category:</label>
-            <select id="category" name="category" required onchange="toggleCustomCategory(this)">
-              <option value="" disabled selected>Select a category</option>
-              <option value="career">Career</option>
-              <option value="relationships">Relationships</option>
-              <option value="health">Health</option>
-              <option value="finance">Finance</option>
-              <option value="personal-growth">Personal Growth</option>
-              <option value="custom">Custom Category</option>
-            </select>
-            <input type="text" id="custom-category" name="custom_category" placeholder="Enter your custom category" class="custom-input" style="display: none;" required disabled>
+            <label for="category">Advice Topic:</label>
+            <input
+              type="text"
+              id="category"
+              name="category"
+              placeholder="Enter the topic you want advice on"
+              required
+            />
           </div>
 
           <!-- Advice Style Selection -->
           <div class="radio-container">
             <p>Advice Style:</p>
             <div class="radio-options">
-              <input type="radio" id="strict" name="advice_type" value="strict" required>
-              <label for="strict">Strict & Direct</label>
-
-              <input type="radio" id="relaxed" name="advice_type" value="relaxed">
-              <label for="relaxed">Relaxed & Flexible</label>
-
-              <input type="radio" id="candid" name="advice_type" value="candid">
-              <label for="candid">Honest & Candid</label>
+              <label>
+                <input
+                  type="radio"
+                  name="advice_style"
+                  value="philosophical"
+                  required
+                />
+                Philosophical & Deep
+              </label>
+              <label>
+                <input type="radio" name="advice_style" value="practical" />
+                Practical & Actionable
+              </label>
+              <label>
+                <input type="radio" name="advice_style" value="empathetic" />
+                Empathetic & Supportive
+              </label>
+              <label>
+                <input type="radio" name="advice_style" value="humorous" />
+                Humorous & Light-hearted
+              </label>
             </div>
+          </div>
+
+          <!-- Mood Selection -->
+          <div class="choice-container">
+            <label for="mood">Current Mood:</label>
+            <select id="mood" name="mood" required>
+              <option value="" disabled selected>Select your mood</option>
+              <option value="overwhelmed">Overwhelmed</option>
+              <option value="motivated">Motivated</option>
+              <option value="confused">Confused</option>
+              <option value="hopeful">Hopeful</option>
+              <option value="stressed">Stressed</option>
+            </select>
           </div>
 
           <!-- Submit Button -->
@@ -59,10 +83,15 @@
         </form>
 
         <!-- Advice Display -->
-        <div id="advice-container"></div>
+        <div id="advice-container" class="advice-container"></div>
       </div>
     </section>
 
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+      <div class="spinner"></div>
+      <span class="loading-text">Loading...</span>
+    </div>
     <!-- Footer -->
     <footer>
       <p>© 2025 GuidanceHub. All rights reserved.</p>

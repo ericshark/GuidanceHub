@@ -1,0 +1,42 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login In - AI-Powered Life Advice</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- Navigation -->
+    <%- include('partials/nav') %>
+
+    <!-- Hero Section -->
+<section class="hero">
+      <div class="content-container">
+        <h1>Your Previous Conversations</h1>
+        
+        <% if (feedback.length > 0) { %>
+          <ul class="conversations-list">
+            <% feedback.forEach(item => { %>
+              <li class="conversation-item">
+                <div class="conversation-text"><%= item.feedback %></div>
+                <div class="conversation-timestamp"><%= item.timestamp.toLocaleString() %></div>
+              </li>
+            <% }) %>
+          </ul>
+        <% } else { %>
+          <p class="no-conversations">No conversations found. Start by getting advice!</p>
+        <% } %>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <p>© 2025 GuidanceHub. All rights reserved.</p>
+    </footer>
+    <script src="index.js"></script>
+  </body>
+</html>
+</html>

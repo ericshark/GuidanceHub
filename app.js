@@ -17,13 +17,18 @@ mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
 
-// Passport Configuration
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+
+const callbackURL = process.env.NODE_ENV === 'production'
+  ? 'https://guidancehub.onrender.com/auth/google/callback'
+  : 'http://localhost:3000/auth/google/callback';
+
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: '/auth/google/callback'
-},
-(accessToken, refreshToken, profile, done) => {
+  callbackURL: callbackURL
+}, (accessToken, refreshToken, profile, done) => {
+  // User serialization logic (e.g., find or create user)
   return done(null, profile);
 }));
 

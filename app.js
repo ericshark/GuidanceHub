@@ -10,25 +10,15 @@ const mongoose = require('mongoose');
 const MongoStore = require('connect-mongo');
 
 // Set view engine
-const app = express();
+app.set('view engine', 'ejs');
 
 // Connect to MongoDB
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/mydatabase';
-mongoose.connect(MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(() => console.log('✅ MongoDB Connected'))
-  .catch(err => console.error('❌ MongoDB Connection Error:', err));
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/guidancehub';
+mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(err => console.error('MongoDB connection error:', err));
 
-// Define User Schema
-const userSchema = new mongoose.Schema({
-  googleId: String,
-  name: String,
-  email: String,
-});
-const User = mongoose.model('User', userSchema);
-
-// Express Session Middleware (Must be BEFORE Passport)
+// Session Middleware with Debugging
 app.use(session({
   secret: process.env.SESSION_SECRET || 'your-session-secret',
   resave: false,
@@ -36,70 +26,56 @@ app.use(session({
   store: MongoStore.create({
     mongoUrl: MONGO_URI,
     collectionName: 'sessions',
-    ttl: 24 * 60 * 60, // 24 hours
+    ttl: 24 * 60 * 60 // 24 hours in seconds
   }),
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
+    secure: process.env.NODE_ENV === 'production', // HTTPS on Render
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    sameSite: 'lax',
-    httpOnly: true,
+    sameSite: 'lax', // Helps with cross-site requests
+    httpOnly: true
   }
 }));
 
-// Passport Middleware (MUST be AFTER session)
-app.use(passport.initialize());
-app.use(passport.session());
-
-// Debugging Middleware
-app.use((req, res, next) => {
-  console.log('Session:', req.session);
-  console.log('User:', req.user);
-  next();
+// Debug session store
+const sessionStore = app.get('sessionStore');
+sessionStore.on('error', (err) => {
+  console.error('Session store error:', err);
 });
 
-// Passport Google OAuth Strategy
+// Passport Configuration
+const callbackURL = process.env.NODE_ENV === 'production'
+  ? 'https://pathfinder-krpb.onrender.com'
+  : 'http://localhost:3000/auth/google/callback';
+console.log('Using callbackURL:', callbackURL);
+
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: '/auth/google/callback',
-}, async (accessToken, refreshToken, profile, done) => {
-  try {
-    let user = await User.findOne({ googleId: profile.id });
-    if (!user) {
-      user = await new User({
-        googleId: profile.id,
-        name: profile.displayName,
-        email: profile.emails[0].value,
-      }).save();
-    }
-    return done(null, user);
-  } catch (err) {
-    return done(err, null);
-  }
+  callbackURL: callbackURL
+}, (accessToken, refreshToken, profile, done) => {
+  console.log('Google OAuth profile:', profile);
+  return done(null, profile);
 }));
 
-// Serialize & Deserialize User
 passport.serializeUser((user, done) => {
+  console.log('Serializing user:', user.id);
   done(null, user.id);
 });
 
-passport.deserializeUser(async (id, done) => {
-  try {
-    const user = await User.findById(id);
-    done(null, user);
-  } catch (err) {
-    done(err, null);
-  }
+passport.deserializeUser((id, done) => {
+  console.log('Deserializing user ID:', id);
+  done(null, { id });
 });
 
-// Google Auth Routes
-app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-
-app.get('/auth/google/callback', passport.authenticate('google', {
-  successRedirect: '/dashboard',
-  failureRedirect: '/',
-}));
-
+// Middleware
+app.use(passport.initialize());
+app.use(passport.session());
+app.use((req, res, next) => {
+  console.log('Session on request:', req.session);
+  console.log('User on request:', req.user);
+  res.locals.user = req.user;
+  next();
+});
 app.use(express.static('public'));
 app.use(morgan('dev'));
 app.use(express.json());
@@ -309,5 +285,8 @@ app.use((req, res) => {
   res.status(404).render('404');
 });
 
+// Start Server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});

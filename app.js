@@ -7,7 +7,7 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const session = require('express-session');
 const mongoose = require('mongoose');
-const MongoStore = require('connect-mongo');
+const MongoStore = require('connect-mongo'); // Added import
 
 // Set view engine
 app.set('view engine', 'ejs');
@@ -18,33 +18,24 @@ mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
 
-// Session Middleware with Debugging
+// Session Middleware
 app.use(session({
   secret: process.env.SESSION_SECRET || 'your-session-secret',
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
     mongoUrl: MONGO_URI,
-    collectionName: 'sessions',
-    ttl: 24 * 60 * 60 // 24 hours in seconds
+    collectionName: 'sessions'
   }),
   cookie: {
-    secure: process.env.NODE_ENV === 'production', // HTTPS on Render
-    maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    sameSite: 'lax', // Helps with cross-site requests
-    httpOnly: true
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
 }));
 
-// Debug session store
-const sessionStore = app.get('sessionStore');
-sessionStore.on('error', (err) => {
-  console.error('Session store error:', err);
-});
-
 // Passport Configuration
 const callbackURL = process.env.NODE_ENV === 'production'
-  ? 'https://pathfinder-krpb.onrender.com'
+  ? 'https://pathfinder-krpb.onrender.com/auth/google/callback'
   : 'http://localhost:3000/auth/google/callback';
 console.log('Using callbackURL:', callbackURL);
 
@@ -58,21 +49,17 @@ passport.use(new GoogleStrategy({
 }));
 
 passport.serializeUser((user, done) => {
-  console.log('Serializing user:', user.id);
-  done(null, user.id);
+  done(null, user);
 });
 
-passport.deserializeUser((id, done) => {
-  console.log('Deserializing user ID:', id);
-  done(null, { id });
+passport.deserializeUser((user, done) => {
+  done(null, user);
 });
 
 // Middleware
 app.use(passport.initialize());
 app.use(passport.session());
 app.use((req, res, next) => {
-  console.log('Session on request:', req.session);
-  console.log('User on request:', req.user);
   res.locals.user = req.user;
   next();
 });
@@ -117,8 +104,7 @@ app.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/' }),
   (req, res) => {
     console.log('Login successful, user:', req.user);
-    console.log('Session after login:', req.session);
-    res.redirect('/account');
+    res.redirect('/account'); // Redirect to /account instead of /home
   }
 );
 
@@ -127,7 +113,6 @@ app.get('/logout', (req, res, next) => {
     if (err) return next(err);
     req.session.destroy((err) => {
       if (err) return next(err);
-      console.log('Session destroyed on logout');
       res.redirect('/');
     });
   });

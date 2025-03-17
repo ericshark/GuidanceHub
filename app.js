@@ -7,7 +7,7 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const session = require('express-session');
 const mongoose = require('mongoose');
-const MongoStore = require('connect-mongo'); // This is correct
+const MongoStore = require('connect-mongo'); // Added import
 
 // Set view engine
 app.set('view engine', 'ejs');
@@ -18,32 +18,33 @@ mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
 
-
+// Session Middleware
 app.use(session({
   secret: process.env.SESSION_SECRET || 'your-session-secret',
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
-    mongoUrl: process.env.MONGO_URI || 'mongodb://localhost:27017/guidancehub',
+    mongoUrl: MONGO_URI,
     collectionName: 'sessions'
   }),
   cookie: {
-    secure: process.env.NODE_ENV === 'production', // Important for Render (HTTPS)
+    secure: process.env.NODE_ENV === 'production',
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
 }));
 
-
+// Passport Configuration
 const callbackURL = process.env.NODE_ENV === 'production'
-  ? 'https://pathfinder-krpb.onrender.com'
-  : 'https://pathfinder-krpb.onrender.com';
+  ? 'https://pathfinder-krpb.onrender.com/auth/google/callback'
+  : 'http://localhost:3000/auth/google/callback';
+console.log('Using callbackURL:', callbackURL);
 
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
   callbackURL: callbackURL
 }, (accessToken, refreshToken, profile, done) => {
-  // User serialization logic (e.g., find or create user)
+  console.log('Google OAuth profile:', profile);
   return done(null, profile);
 }));
 
@@ -55,19 +56,19 @@ passport.deserializeUser((user, done) => {
   done(null, user);
 });
 
-
+// Middleware
 app.use(passport.initialize());
 app.use(passport.session());
 app.use((req, res, next) => {
-  res.locals.user = req.user; // Make user available in all templates
+  res.locals.user = req.user;
   next();
 });
-app.use(express.static('public')); // Serve static files (CSS, JS)
-app.use(morgan('dev')); // Logging
-app.use(express.json()); // Parse JSON bodies
-app.use(express.urlencoded({ extended: true })); // Parse form data
+app.use(express.static('public'));
+app.use(morgan('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Initialize OpenAI with API key from .env
+// Initialize OpenAI
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -82,6 +83,9 @@ const Feedback = mongoose.model('Feedback', feedbackSchema);
 
 // Authentication Middleware
 const ensureAuthenticatedWeb = (req, res, next) => {
+  console.log('User authenticated:', req.isAuthenticated());
+  console.log('Session:', req.session);
+  console.log('User:', req.user);
   if (req.isAuthenticated()) return next();
   res.redirect('/login');
 };
@@ -99,15 +103,24 @@ app.get('/auth/google',
 app.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/' }),
   (req, res) => {
-    res.redirect('/home');
+    console.log('Login successful, user:', req.user);
+    res.redirect('/account'); // Redirect to /account instead of /home
   }
 );
 
-app.get('/logout', (req, res) => {
+app.get('/logout', (req, res, next) => {
   req.logout((err) => {
-    if (err) return res.status(500).send('Logout failed');
-    res.redirect('/');
+    if (err) return next(err);
+    req.session.destroy((err) => {
+      if (err) return next(err);
+      res.redirect('/');
+    });
   });
+});
+
+// Account Route
+app.get('/account', ensureAuthenticatedWeb, (req, res) => {
+  res.render('account', { user: req.user });
 });
 
 // Feedback Routes
@@ -141,7 +154,7 @@ app.get('/conversations', ensureAuthenticatedWeb, async (req, res) => {
   try {
     console.log('User ID:', req.user ? req.user.id : 'Not authenticated');
     const feedbackList = await Feedback.find({ userId: req.user ? req.user.id : '' })
-      .sort({ timestamp: -1 }); // Sort by timestamp in descending order (most recent first)
+      .sort({ timestamp: -1 });
     console.log('Feedback found:', feedbackList);
     res.render('conversations', { feedback: feedbackList });
   } catch (error) {
@@ -150,7 +163,7 @@ app.get('/conversations', ensureAuthenticatedWeb, async (req, res) => {
   }
 });
 
-// Existing Routes
+// Other Routes
 app.get('/', (req, res) => {
   res.render('index');
 });
@@ -179,12 +192,10 @@ app.get('/contact', (req, res) => {
   res.render('contact');
 });
 
+app.get('/create', (req, res) => {
+  res.render('create');
+});
 
-
-// New API Endpoints for Advice Form
-// ... (previous imports and middleware remain the same) ...
-
-// New API Endpoints for Advice Form
 app.post('/get-questions', ensureAuthenticatedApi, async (req, res) => {
   const { category, advice_style, mood } = req.body;
   if (!category || !advice_style) {
@@ -195,10 +206,10 @@ app.post('/get-questions', ensureAuthenticatedApi, async (req, res) => {
 
   try {
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini', // Upgraded to gpt-4o-mini
+      model: 'gpt-4o-mini',
       messages: [{ role: 'user', content: prompt }],
-      temperature: 0.7, // Optional: Adjust for creativity (0.7 is a good balance)
-      max_tokens: 150 // Optional: Limit response length to ensure concise questions
+      temperature: 0.7,
+      max_tokens: 150
     });
     const questionsText = completion.choices[0].message.content;
     const questions = questionsText
@@ -212,8 +223,6 @@ app.post('/get-questions', ensureAuthenticatedApi, async (req, res) => {
     res.status(500).json({ error: 'Failed to get questions' });
   }
 });
-
-// ... (rest of app.js remains the same) ...
 
 app.post('/get-advice', ensureAuthenticatedApi, async (req, res) => {
   const { category, advice_style, mood, question0, question1, question2, answer0, answer1, answer2 } = req.body;
@@ -230,14 +239,14 @@ app.post('/get-advice', ensureAuthenticatedApi, async (req, res) => {
   qaPairs.forEach((qa, index) => {
     qaText += `Question ${index + 1}: ${qa.question}\nAnswer ${index + 1}: ${qa.answer}\n`;
   });
-  const prompt = `Given the category '${category}', the advice style '${advice_style}', the user's current mood '${mood}', and the following questions and answers:\n${qaText}Please provide detailed and personalized advice just give me a concise paragragh nothing more.`;
+  const prompt = `Given the category '${category}', the advice style '${advice_style}', the user's current mood '${mood}', and the following questions and answers:\n${qaText}Please provide detailed and personalized advice in a concise paragraph.`;
 
   try {
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini', // Upgraded to gpt-4o-mini
+      model: 'gpt-4o-mini',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.7,
-      max_tokens: 500 // Adjust for longer advice
+      max_tokens: 500
     });
     const advice = completion.choices[0].message.content;
 
@@ -255,6 +264,7 @@ app.post('/get-advice', ensureAuthenticatedApi, async (req, res) => {
     res.status(500).json({ error: 'Failed to get advice' });
   }
 });
+
 // 404 Handler
 app.use((req, res) => {
   res.status(404).render('404');

@@ -20,7 +20,7 @@ mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 const callbackURL = process.env.NODE_ENV === 'production'
-  ? 'https://guidancehub.onrender.com/auth/google/callback'
+  ? 'https://pathfinder-krpb.onrender.com'
   : 'http://localhost:3000/auth/google/callback';
 
 passport.use(new GoogleStrategy({

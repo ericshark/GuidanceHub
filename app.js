@@ -7,7 +7,7 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const session = require('express-session');
 const mongoose = require('mongoose');
-const MongoStore = require('connect-mongo'); // Added import
+const MongoStore = require('connect-mongo');
 
 // Set view engine
 app.set('view engine', 'ejs');
@@ -29,7 +29,8 @@ app.use(session({
   }),
   cookie: {
     secure: process.env.NODE_ENV === 'production',
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    maxAge: 24 * 60 * 60 * 1000,
+    sameSite: 'lax'
   }
 }));
 
@@ -49,11 +50,11 @@ passport.use(new GoogleStrategy({
 }));
 
 passport.serializeUser((user, done) => {
-  done(null, user);
+  done(null, user.id);
 });
 
-passport.deserializeUser((user, done) => {
-  done(null, user);
+passport.deserializeUser((id, done) => {
+  done(null, { id });
 });
 
 // Middleware
@@ -104,7 +105,7 @@ app.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/' }),
   (req, res) => {
     console.log('Login successful, user:', req.user);
-    res.redirect('/account'); // Redirect to /account instead of /home
+    res.redirect('/account');
   }
 );
 

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GuidanceHub - Saved Advice</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/auth.js" defer></script>
+  </head>
+  <body>
+    <!-- Navigation -->
+    <%- include('partials/nav') %>
+
+    <section class="saved-advice">
+      <div class="content-container">
+        <h1>Your Saved Advice</h1>
+        
+        <div id="saved-advice-container">
+          <% if (savedAdvice && savedAdvice.length > 0) { %>
+            <% savedAdvice.forEach(advice => { %>
+              <div class="advice-card">
+                <h3><%= advice.category %></h3>
+                <div class="advice-content">
+                  <p><%= advice.advice %></p>
+                </div>
+                <div class="advice-meta">
+                  <span class="advice-date"><%= new Date(advice.createdAt).toLocaleDateString() %></span>
+                </div>
+              </div>
+            <% }); %>
+          <% } else { %>
+            <div class="empty-state">
+              <p>You haven't saved any advice yet.</p>
+              <a href="/begin" class="button primary-button">Get Some Advice</a>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <p>© 2025 GuidanceHub. All rights reserved.</p>
+    </footer>
+    <script src="/index.js"></script>
+  </body>
+</html>

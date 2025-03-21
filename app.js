@@ -114,7 +114,7 @@ app.get('/auth/google',
 app.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/' }),
   (req, res) => {
-    const redirectUrl = req.session.returnTo || '/account';
+    const redirectUrl = req.session.returnTo || '/';
     delete req.session.returnTo; // Clear the saved URL
     res.redirect(redirectUrl);
   }
@@ -142,6 +142,18 @@ app.get('/logout', (req, res, next) => {
 // Account Route
 app.get('/account', ensureAuthenticatedWeb, (req, res) => {
   res.render('account', { user: req.user });
+});
+
+// Saved Advice Route
+app.get('/saved-advice', ensureAuthenticatedWeb, async (req, res) => {
+  try {
+    // If you have a Feedback model that stores saved advice
+    const savedAdvice = await Feedback.find({ userId: req.user.id, saved: true }).sort({ createdAt: -1 });
+    res.render('saved-advice', { user: req.user, savedAdvice });
+  } catch (error) {
+    console.error('Error fetching saved advice:', error);
+    res.render('saved-advice', { user: req.user, savedAdvice: [] });
+  }
 });
 
 // Feedback Routes

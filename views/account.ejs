@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GuidanceHub - Account</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/auth.js" defer></script>
+  </head>
+  <body>
+    <!-- Navigation -->
+    <%- include('partials/nav') %>
+
+    <section class="account">
+      <div class="content-container">
+        <h1>Your Account</h1>
+        
+        <div class="profile-info">
+          <div class="profile-header">
+            <% if (user.photos && user.photos.length > 0) { %>
+              <img src="<%= user.photos[0].value %>" alt="Profile Picture" class="profile-picture" />
+            <% } else { %>
+              <img src="/default-avatar.png" alt="Default Profile Picture" class="profile-picture" />
+            <% } %>
+            <div class="profile-details">
+              <h2><%= user.displayName || 'User' %></h2>
+              <% if (user.emails && user.emails.length > 0) { %>
+                <p><%= user.emails[0].value %></p>
+              <% } %>
+            </div>
+          </div>
+          
+          <div class="account-actions">
+            <a href="/begin" class="button primary-button">Get New Advice</a>
+            <a href="/saved-advice" class="button secondary-button">View Saved Advice</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <p>© 2025 GuidanceHub. All rights reserved.</p>
+    </footer>
+    <script src="/index.js"></script>
+  </body>
+</html>

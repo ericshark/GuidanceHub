@@ -402,6 +402,116 @@ button:active {
   transition: opacity 0.3s ease;
 }
 
+/* Account Page Styles */
+.account {
+  padding: 2rem 0;
+}
+
+.profile-info {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  padding: 2rem;
+  margin-top: 1.5rem;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.profile-picture {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 1.5rem;
+  border: 3px solid #6a0dad;
+}
+
+.profile-details h2 {
+  margin-bottom: 0.5rem;
+  color: #ffffff;
+}
+
+.profile-details p {
+  color: #e0e0e0;
+  font-size: 0.9rem;
+}
+
+.account-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.button {
+  display: inline-block;
+  padding: 0.8rem 1.5rem;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.primary-button {
+  background: linear-gradient(135deg, #6a0dad 0%, #9b4dca 100%);
+  color: white;
+}
+
+.primary-button:hover {
+  background: linear-gradient(135deg, #7b1ebe 0%, #ac5edb 100%);
+  transform: translateY(-2px);
+}
+
+.secondary-button {
+  background: transparent;
+  color: #9b4dca;
+  border: 2px solid #9b4dca;
+}
+
+.secondary-button:hover {
+  background: rgba(155, 77, 202, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Saved Advice Page Styles */
+.saved-advice {
+  padding: 2rem 0;
+}
+
+.advice-card {
+  margin-bottom: 1.5rem;
+  transition: transform 0.3s ease;
+}
+
+.advice-card:hover {
+  transform: translateY(-5px);
+}
+
+.advice-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  color: #e0e0e0;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 0;
+}
+
+.empty-state p {
+  margin-bottom: 1.5rem;
+  font-size: 1.2rem;
+  color: #e0e0e0;
+}
+
 #loading-overlay.active {
   opacity: 1;
 }

@@ -1,23 +1,65 @@
- <nav>
+<nav>
   <div class="logo">GuidanceHub</div>
-  <ul>
+  <div class="nav-toggle" id="navToggle">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+  <ul class="nav-links" id="navLinks">
     <li><a href="/home">Home</a></li>
-    <% if (user) { %>
-    <li>
-      <a href="/begin">Begin</a>
-    </li>
-    <% } %>
-  
     <li><a href="/about">About</a></li>
     <li><a href="/contact">Contact</a></li>
-    <% if(!user){ %>
-    <li><a class="login-btn" href="/login">Login</a></li>
-    <% } %>
-
     <% if (user) { %>
-    <li>
-      <a class="login-btn" href="/conversations">View Previous Conversations</a>
+    <li class="auth-dependent">
+      <a href="/begin">Begin</a>
+    </li>
+    <li class="auth-dependent">
+      <a href="/conversations">My Conversations</a>
     </li>
     <% } %>
   </ul>
+  
+  <% if(!user){ %>
+  <a class="login-btn" href="/login">Login</a>
+  <% } else { %>
+  <div class="user-menu">
+    <button class="user-menu-button" id="userMenuBtn">
+      <img src="<%= user.photos && user.photos[0] ? user.photos[0].value : '/default-avatar.png' %>" alt="Profile" class="user-avatar" width="32" height="32">
+      <span><%= user.displayName || 'User' %></span>
+    </button>
+    <div class="user-menu-dropdown" id="userMenuDropdown">
+      <a href="/account">My Account</a>
+      <a href="/conversations">My Conversations</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </div>
+  <% } %>
 </nav>
+
+<script>
+  // Toggle mobile menu
+  document.getElementById('navToggle').addEventListener('click', function() {
+    document.getElementById('navLinks').classList.toggle('active');
+    this.classList.toggle('active');
+  });
+  
+  // Toggle user menu dropdown
+  const userMenuBtn = document.getElementById('userMenuBtn');
+  const userMenuDropdown = document.getElementById('userMenuDropdown');
+  
+  if (userMenuBtn && userMenuDropdown) {
+    userMenuBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      userMenuDropdown.style.display = userMenuDropdown.style.display === 'block' ? 'none' : 'block';
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function() {
+      if (userMenuDropdown) userMenuDropdown.style.display = 'none';
+    });
+    
+    userMenuDropdown.addEventListener('click', function(e) {
+      e.stopPropagation();
+    });
+  }
+</script>

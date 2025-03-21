@@ -61,12 +61,21 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use((req, res, next) => {
   res.locals.user = req.user;
+  res.locals.isAuthenticated = req.isAuthenticated();
   next();
 });
 app.use(express.static('public'));
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Auth Status Endpoint
+app.get('/auth/status', (req, res) => {
+  res.json({
+    isAuthenticated: req.isAuthenticated(),
+    user: req.user
+  });
+});
 
 // Initialize OpenAI
 const openai = new OpenAI({
@@ -97,14 +106,19 @@ const ensureAuthenticatedApi = (req, res, next) => {
 
 // Authentication Routes
 app.get('/auth/google',
+  (req, res, next) => {
+    req.session.returnTo = req.headers.referer || '/'; // Save the original URL
+    next();
+  },
   passport.authenticate('google', { scope: ['profile', 'email'] })
 );
 
 app.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/' }),
   (req, res) => {
-    console.log('Login successful, user:', req.user);
-    res.redirect('/account'); // Redirect to /account instead of /home
+    const redirectUrl = req.session.returnTo || '/account';
+    delete req.session.returnTo; // Clear the saved URL
+    res.redirect(redirectUrl);
   }
 );
 

@@ -1,4 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // Check authentication status
+  checkAuthStatus();
+  
+  // Setup UI components
   const initialForm = document.getElementById('initial-form');
   const questionsForm = document.getElementById('questions-form');
   const questionsContainer = document.getElementById('questions-container');
@@ -6,14 +10,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const loadingOverlay = document.getElementById('loading-overlay');
   const introSection = document.getElementById('intro-section');
 
-  // Function to show loading screen
+  // Function to show loading screen with animation
   const showLoading = () => {
     loadingOverlay.style.display = 'flex';
+    loadingOverlay.classList.add('active');
   };
 
-  // Function to hide loading screen
+  // Function to hide loading screen with animation
   const hideLoading = () => {
-    loadingOverlay.style.display = 'none';
+    loadingOverlay.classList.remove('active');
+    setTimeout(() => {
+      loadingOverlay.style.display = 'none';
+    }, 300);
   };
 
   // Handle Initial Form Submission (Get Questions)
@@ -35,9 +43,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (response.ok) {
         if (result.questions && result.questions.length === 3) {
-          introSection.style.display = 'none'; // Hide intro section
-          initialForm.style.display = 'none';
-          questionsForm.style.display = 'block';
+          // Smooth transition between sections
+          introSection.classList.add('fade-out');
+          setTimeout(() => {
+            introSection.style.display = 'none';
+            initialForm.style.display = 'none';
+            questionsForm.style.display = 'block';
+            questionsForm.classList.add('fade-in');
+          }, 300);
 
           questionsContainer.innerHTML = `
             <input type="hidden" name="category" value="${category}">
@@ -58,8 +71,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       } else {
         if (response.status === 401) {
-          alert('You need to log in to get advice. Redirecting to login...');
-          window.location.href = '/auth/google';
+          const confirmLogin = confirm('You need to log in to get advice. Would you like to log in now?');
+          if (confirmLogin) {
+            window.location.href = '/auth/google';
+          }
         } else {
           alert(result.error || 'An error occurred. Please try again.');
         }
@@ -100,13 +115,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (response.ok) {
         if (result.advice) {
-          introSection.style.display = 'none'; // Ensure intro section is hidden
-          questionsForm.style.display = 'none';
-          adviceContainer.style.display = 'block'; // Ensure advice container is visible
-          adviceContainer.innerHTML = `
-            <h2>Your Personalized Advice</h2>
-            <p class="advice-text">${result.advice}</p>
-          `;
+          // Smooth transition to advice section
+          questionsForm.classList.add('fade-out');
+          setTimeout(() => {
+            introSection.style.display = 'none'; // Ensure intro section is hidden
+            questionsForm.style.display = 'none';
+            adviceContainer.style.display = 'block'; // Ensure advice container is visible
+            adviceContainer.classList.add('fade-in');
+            adviceContainer.innerHTML = `
+              <div class="advice-card">
+                <h2>Your Personalized Advice</h2>
+                <div class="advice-content">
+                  <p class="advice-text">${result.advice}</p>
+                </div>
+                <div class="advice-actions">
+                  <button id="new-advice" class="secondary-btn">Get New Advice</button>
+                  <button id="save-advice" class="primary-btn">Save This Advice</button>
+                </div>
+              </div>
+            `;
+            
+            // Add event listeners for the new buttons
+            document.getElementById('new-advice').addEventListener('click', () => {
+              window.location.reload();
+            });
+            
+            document.getElementById('save-advice').addEventListener('click', async () => {
+              try {
+                const response = await fetch('/feedback', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ feedback: result.advice })
+                });
+                
+                if (response.ok) {
+                  alert('Advice saved successfully!');
+                } else {
+                  alert('Failed to save advice. Please try again.');
+                }
+              } catch (error) {
+                console.error('Error saving advice:', error);
+                alert('An error occurred while saving your advice.');
+              }
+            });
+          }, 300);
         } else {
           alert('Failed to retrieve advice. Please try again.');
         }

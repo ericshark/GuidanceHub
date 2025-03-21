@@ -22,20 +22,20 @@ mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
 app.use(session({
   secret: process.env.SESSION_SECRET || 'your-session-secret',
   resave: false,
-  saveUninitialized: false,
+  saveUninitialized: true,
   store: MongoStore.create({
     mongoUrl: MONGO_URI,
     collectionName: 'sessions'
   }),
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
+    secure: false, // Set to true only in production with HTTPS
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
 }));
 
 // Passport Configuration
 const callbackURL = process.env.NODE_ENV === 'production'
-  ? 'https://pathfinder-krpb.onrender.com'
+  ? 'https://pathfinder-krpb.onrender.com/auth/google/callback'
   : 'http://localhost:3000/auth/google/callback';
 console.log('Using callbackURL:', callbackURL);
 
@@ -123,10 +123,19 @@ app.get('/auth/google/callback',
 );
 
 app.get('/logout', (req, res, next) => {
+  // Clear the user from the session
   req.logout((err) => {
     if (err) return next(err);
+    
+    // Destroy the session
     req.session.destroy((err) => {
       if (err) return next(err);
+      
+      // Clear the session cookie
+      res.clearCookie('connect.sid');
+      console.log('User logged out, session destroyed');
+      
+      // Redirect to home page
       res.redirect('/');
     });
   });

@@ -7,19 +7,31 @@
     <link rel="stylesheet" href="/styles.css" />
     <!-- Removing auth.js which is causing errors -->
     <!-- <script src="/auth.js" defer></script> -->
-    <!-- Add inline debugging script -->
+    <!-- Remove old debugging script - use the new begin-page.js instead -->
+    <!-- 
     <script>
-      console.log('Begin page loaded - Inline script executing');
-      
-      // Check if scripts are loading
-      window.addEventListener('DOMContentLoaded', function() {
-        console.log('DOM fully loaded');
-        
-        // Test DOM manipulation directly
+      console.log('Begin page script executing');
+      document.addEventListener('DOMContentLoaded', () => {
+        console.log('DOM fully loaded and parsed');
+        const initialForm = document.getElementById('initial-form');
+        const questionsForm = document.getElementById('questions-form');
+        const questionsContainer = document.getElementById('questions-container');
+        const adviceContainer = document.getElementById('advice-container');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const introSection = document.getElementById('intro-section');
+
+        console.log('Initial form:', initialForm);
+        console.log('Questions form:', questionsForm);
+        console.log('Questions container:', questionsContainer);
+        console.log('Advice container:', adviceContainer);
+        console.log('Loading overlay:', loadingOverlay);
+        console.log('Intro section:', introSection);
+
+        // Test a click handler on the debug element
         const debugInfo = document.createElement('div');
         debugInfo.style.position = 'fixed';
-        debugInfo.style.bottom = '10px';
-        debugInfo.style.right = '10px';
+        debugInfo.style.top = '10px';
+        debugInfo.style.left = '10px';
         debugInfo.style.backgroundColor = 'rgba(0,0,0,0.7)';
         debugInfo.style.color = 'white';
         debugInfo.style.padding = '10px';
@@ -27,104 +39,197 @@
         debugInfo.textContent = 'Debug: Page loaded at ' + new Date().toISOString();
         document.body.appendChild(debugInfo);
         
-        // Test a click handler on the debug element
         debugInfo.addEventListener('click', function() {
           alert('Debug element clicked - DOM events are working');
         });
+
+        console.log('Debug element added to the page');
       });
     </script>
+    -->
+    <!-- Load our dedicated begin page script -->
+    <script src="/begin-page.js" defer></script>
   </head>
   <body>
-    <!-- Navigation -->
-    <%- include('partials/nav') %>
+    <div class="content-wrapper">
+      <!-- Additional styles to ensure form elements are above any overlays -->
+      <style>
+        /* Fix for unresponsive elements */
+        body, html {
+          height: 100%;
+          width: 100%;
+          overflow-x: hidden;
+        }
+        
+        /* Ensure all elements are clickable */
+        .contact {
+          z-index: 10 !important;
+          position: relative !important;
+        }
+        
+        .content-container {
+          z-index: 10 !important;
+          position: relative !important;
+          pointer-events: auto !important;
+        }
+        
+        /* Make sure all form elements can receive clicks */
+        #initial-form, 
+        #questions-form,
+        input, 
+        select, 
+        button, 
+        label, 
+        .choice-container, 
+        .radio-container, 
+        .radio-options {
+          z-index: 100 !important;
+          position: relative !important;
+          pointer-events: auto !important;
+        }
+        
+        /* Specifically target radio buttons */
+        input[type="radio"] {
+          cursor: pointer !important;
+          pointer-events: auto !important;
+          opacity: 1 !important;
+          position: relative !important;
+          z-index: 1000 !important;
+        }
+        
+        /* Remove any hidden overlays */
+        body::before,
+        body::after,
+        .hero::before,
+        .hero::after,
+        .about::before,
+        .about::after,
+        .contact::before,
+        .contact::after {
+          display: none !important;
+          content: none !important;
+        }
+      </style>
+  
+      <!-- Navigation -->
+      <%- include('partials/nav') %>
 
-   <section class="contact">
-      <div class="content-container">
-        <div class="intro-section" id="intro-section">
-          <h1>Fill in Information</h1>
+     <section class="contact">
+        <div class="content-container">
+          <div class="intro-section" id="intro-section">
+            <h1>Fill in Information</h1>
 
-        </div>
-
-        <!-- Initial Form -->
-        <form id="initial-form" class="user-information" onsubmit="event.preventDefault(); console.log('Form submitted via inline handler'); submitInitialForm(this);">
-          <!-- Topic Input -->
-          <div class="choice-container">
-            <label for="category">Advice Topic:</label>
-            <input
-              type="text"
-              id="category"
-              name="category"
-              placeholder="Enter the topic you want advice on"
-              required
-              onclick="console.log('Input field clicked')"
-            />
           </div>
 
-          <!-- Advice Style Selection -->
-          <div class="radio-container">
-            <p>Advice Style:</p>
-            <div class="radio-options">
-              <label>
-                <input
-                  type="radio"
-                  name="advice_style"
-                  value="philosophical"
-                  required
-                  onclick="console.log('Radio option clicked')"
-                />
-                Philosophical & Deep
-              </label>
-              <label>
-                <input type="radio" name="advice_style" value="practical" onclick="console.log('Radio option clicked')" />
-                Practical & Actionable
-              </label>
-              <label>
-                <input type="radio" name="advice_style" value="empathetic" onclick="console.log('Radio option clicked')" />
-                Empathetic & Supportive
-              </label>
-              <label>
-                <input type="radio" name="advice_style" value="humorous" onclick="console.log('Radio option clicked')" />
-                Humorous & Light-hearted
-              </label>
+          <!-- Initial Form -->
+          <form id="initial-form" class="user-information" onsubmit="event.preventDefault(); submitInitialForm(this); return false;">
+            <!-- Topic Input -->
+            <div class="choice-container">
+              <label for="category">Advice Topic:</label>
+              <input
+                type="text"
+                id="category"
+                name="category"
+                placeholder="Enter the topic "
+                required
+                style="cursor: pointer; z-index: 1001; position: relative; pointer-events: auto;"
+              />
+            </div>
+
+            <!-- Advice Style Selection -->
+            <div class="radio-container">
+              <p>Choose your preferred advice style:</p>
+              <div class="radio-options">
+                <label style="cursor: pointer; z-index: 1001; position: relative; pointer-events: auto; margin-bottom: 10px;">
+                  <input
+                    type="radio"
+                    id="philosophical"
+                    name="advice_style"
+                    value="philosophical"
+                    required
+                    style="cursor: pointer; z-index: 1001; position: relative; pointer-events: auto;"
+                  />
+                  Philosophical & Deep
+                </label>
+                
+                <label style="cursor: pointer; z-index: 1001; position: relative; pointer-events: auto; margin-bottom: 10px;">
+                  <input type="radio" id="practical" name="advice_style" value="practical" style="cursor: pointer; z-index: 1001; position: relative; pointer-events: auto;" />
+                  Practical & Actionable
+                </label>
+                
+                <label style="cursor: pointer; z-index: 1001; position: relative; pointer-events: auto; margin-bottom: 10px;">
+                  <input type="radio" id="empathetic" name="advice_style" value="empathetic" style="cursor: pointer; z-index: 1001; position: relative; pointer-events: auto;" />
+                  Empathetic & Supportive
+                </label>
+                
+                <label style="cursor: pointer; z-index: 1001; position: relative; pointer-events: auto;">
+                  <input type="radio" id="humorous" name="advice_style" value="humorous" style="cursor: pointer; z-index: 1001; position: relative; pointer-events: auto;" />
+                  Humorous & Light-hearted
+                </label>
+              </div>
+            </div>
+
+            <!-- Mood Selection -->
+            <div class="choice-container">
+              <label for="mood">Your Current Mood</label>
+              <select id="mood" name="mood" required class="styled-select" style="cursor: pointer; z-index: 1001; position: relative; pointer-events: auto;">
+                <option value="" disabled selected>Select your mood</option>
+                <option value="overwhelmed">Overwhelmed</option>
+                <option value="motivated">Motivated</option>
+                <option value="confused">Confused</option>
+                <option value="hopeful">Hopeful</option>
+                <option value="stressed">Stressed</option>
+              </select>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="submit-btn">Get Your Questions</button>
+          </form>
+
+          <!-- Questions Form (Hidden Initially) -->
+          <form id="questions-form" class="user-information" style="display: none;" onsubmit="event.preventDefault(); submitQuestionsForm(this); return false;">
+            <h3 class="section-title">Your Personalized Questions</h3>
+            <p class="section-subtitle">Please answer these questions to receive tailored advice:</p>
+            <div id="questions-container"></div>
+            <button type="submit" class="submit-btn">Get My Advice</button>
+          </form>
+
+          <!-- Advice Display -->
+          <div id="advice-container" class="advice-container">
+            <div id="advice-content" class="advice-content"></div>
+            
+            <!-- Add action buttons for after advice is displayed -->
+            <div class="advice-actions">
+              <button onclick="window.location.reload()" class="submit-btn">Start Over</button>
             </div>
           </div>
+        </div>
+      </section>
 
-          <!-- Mood Selection -->
-          <div class="choice-container">
-            <label for="mood">Current Mood:</label>
-            <select id="mood" name="mood" required onclick="console.log('Mood dropdown clicked')">
-              <option value="" disabled selected>Select your mood</option>
-              <option value="overwhelmed">Overwhelmed</option>
-              <option value="motivated">Motivated</option>
-              <option value="confused">Confused</option>
-              <option value="hopeful">Hopeful</option>
-              <option value="stressed">Stressed</option>
-            </select>
-          </div>
-
-          <!-- Submit Button -->
-          <button type="submit" class="submit-btn">Get Your Questions</button>
-        </form>
-
-        <!-- Questions Form (Hidden Initially) -->
-        <form id="questions-form" class="user-information" style="display: none;">
-          <div id="questions-container"></div>
-          <button type="submit" class="submit-btn">Get My Advice</button>
-        </form>
-
-        <!-- Advice Display -->
-        <div id="advice-container" class="advice-container"></div>
+      <!-- Loading Overlay -->
+      <div id="loading-overlay" class="loading-overlay">
+        <div class="loader"></div>
+        <div class="loader-text">Please wait, processing your request...</div>
       </div>
-    </section>
-
-    <!-- Loading Overlay -->
-    <div id="loading-overlay">
-      <div class="loader"></div>
     </div>
+
     <!-- Footer -->
     <footer>
       <p> 2025 GuidanceHub. All rights reserved.</p>
     </footer>
+
+    <!-- Add script to hide loading overlay immediately -->
+    <script>
+      window.addEventListener('DOMContentLoaded', function() {
+        // Force hide loading overlay
+        const loadingOverlay = document.getElementById('loading-overlay');
+        if (loadingOverlay) {
+          loadingOverlay.style.display = 'none';
+          loadingOverlay.style.opacity = '0';
+          console.log('Loading overlay hidden on page load');
+        }
+      });
+    </script>
 
     <script>
       // Toggle custom category input visibility
@@ -148,20 +253,6 @@
     <script>
       // Fallback implementation in case external scripts don't load properly
       function submitInitialForm(form) {
-        console.log('Submitting form via inline function');
-        
-        // Show debug info
-        const debugInfo = document.createElement('div');
-        debugInfo.style.position = 'fixed';
-        debugInfo.style.top = '10px';
-        debugInfo.style.left = '10px';
-        debugInfo.style.backgroundColor = 'rgba(0,0,0,0.7)';
-        debugInfo.style.color = 'white';
-        debugInfo.style.padding = '10px';
-        debugInfo.style.zIndex = '9999';
-        debugInfo.textContent = 'Processing form submission...';
-        document.body.appendChild(debugInfo);
-        
         // Get form values
         const category = document.getElementById('category').value;
         const advice_style = document.querySelector('input[name="advice_style"]:checked')?.value;
@@ -169,11 +260,8 @@
         
         if (!category || !advice_style || !mood) {
           alert('Please fill in all required fields');
-          debugInfo.textContent = 'Error: Missing required fields';
           return;
         }
-        
-        debugInfo.textContent = `Submitting: ${category}, ${advice_style}, ${mood}`;
         
         // Show loading indicator
         const loadingOverlay = document.getElementById('loading-overlay');
@@ -181,14 +269,14 @@
           loadingOverlay.style.display = 'flex';
         }
         
-        // Manually submit using fetch API
+        // Submit using fetch API
         fetch('/get-questions', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ category, advice_style, mood }),
+          credentials: 'same-origin'
         })
         .then(response => {
-          debugInfo.textContent += ' | Response received';
           if (!response.ok) {
             if (response.status === 401) {
               throw new Error('Unauthorized');
@@ -198,62 +286,25 @@
           return response.json();
         })
         .then(result => {
-          debugInfo.textContent += ' | Processing data';
-          if (result.questions && result.questions.length === 3) {
-            // Handle successful response
-            const introSection = document.getElementById('intro-section');
-            const initialForm = document.getElementById('initial-form');
-            const questionsForm = document.getElementById('questions-form');
-            const questionsContainer = document.getElementById('questions-container');
-            
-            if (introSection) introSection.style.display = 'none';
-            if (initialForm) initialForm.style.display = 'none';
-            
-            if (questionsContainer) {
-              questionsContainer.innerHTML = `
-                <input type="hidden" name="category" value="${category}">
-                <input type="hidden" name="advice_style" value="${advice_style}">
-                <input type="hidden" name="mood" value="${mood}">
-              `;
-              
-              result.questions.forEach((question, index) => {
-                questionsContainer.innerHTML += `
-                  <div class="choice-container">
-                    <label for="answer${index}">Question ${index + 1}: ${question}</label>
-                    <input type="hidden" name="question${index}" value="${question}">
-                    <input type="text" id="answer${index}" name="answer${index}" placeholder="Your answer" required>
-                  </div>
-                `;
-              });
-            }
-            
-            if (questionsForm) {
-              questionsForm.style.display = 'block';
-              debugInfo.textContent = 'Questions loaded successfully';
-            }
-          } else {
-            alert('Failed to retrieve questions. Please try again.');
-            debugInfo.textContent = 'Error: Invalid question data';
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          if (error.message === 'Unauthorized') {
-            const confirmLogin = confirm('You need to log in to get advice. Would you like to log in now?');
-            if (confirmLogin) {
-              window.location.href = '/auth/google';
-            }
-          } else {
-            alert('An error occurred: ' + error.message);
-          }
-          debugInfo.textContent = `Error: ${error.message}`;
-        })
-        .finally(() => {
+          // Handle successful response
+          const initialForm = document.getElementById('initial-form');
+          const questionsForm = document.getElementById('questions-form');
+          
+          if (initialForm) initialForm.style.display = 'none';
+          if (questionsForm) questionsForm.style.display = 'block';
+          
           // Hide loading indicator
-          const loadingOverlay = document.getElementById('loading-overlay');
           if (loadingOverlay) {
             loadingOverlay.style.display = 'none';
           }
+        })
+        .catch(error => {
+          // Hide loading indicator
+          if (loadingOverlay) {
+            loadingOverlay.style.display = 'none';
+          }
+          
+          alert('An error occurred: ' + error.message);
         });
       }
       

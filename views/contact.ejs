@@ -7,31 +7,33 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <!-- Navigation -->
+    <div class="content-wrapper">
+      <!-- Navigation -->
  <%- include('partials/nav') %>
 
-    <!-- Contact Section -->
-    <section class="contact">
-      <div class="content-container">
-        <h1>Get in Touch</h1>
-        <p>We're here to help. Fill out the form below or reach out directly via email or phone.</p>
-        <form class="contact-form">
-          <input type="text" placeholder="Your Name" required />
-          <input type="email" placeholder="Your Email" required />
-          <textarea placeholder="Your Message" required></textarea>
-          <button type="submit">Send Message</button>
-        </form>
-        <div class="contact-info">
-          <p><strong>Email:</strong> contact@guidancehub.com</p>
-          <p><strong>Phone:</strong> (123) 456-7890</p>
-          <p><strong>Address:</strong> 123 AI Street, Tech City, TC 12345</p>
+      <!-- Contact Section -->
+      <section class="contact">
+        <div class="content-container">
+          <h1>Get in Touch</h1>
+          <p>We're here to help. Fill out the form below or reach out directly via email or phone.</p>
+          <form class="contact-form">
+            <input type="text" placeholder="Your Name" required />
+            <input type="email" placeholder="Your Email" required />
+            <textarea placeholder="Your Message" required></textarea>
+            <button type="submit" class="submit-btn">Send Message</button>
+          </form>
+          <div class="contact-info">
+            <p><strong>Email:</strong> contact@guidancehub.com</p>
+            <p><strong>Phone:</strong> (123) 456-7890</p>
+            <p><strong>Address:</strong> 123 AI Street, Tech City, TC 12345</p>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
 
     <!-- Footer -->
     <footer>
-      <p>© 2025 GuidanceHub. All rights reserved.</p>
+      <p> 2025 GuidanceHub. All rights reserved.</p>
     </footer>
   </body>
 </html>

@@ -52,16 +52,14 @@
 </script>
 
 <nav>
-  <div class="logo">GuidanceHub</div>
+  <div class="logo"><a href="/" style="text-decoration: none; color: inherit;">GuidanceHub</a></div>
   <div class="nav-toggle" id="navToggle" onclick="toggleNav(); return false;">
     <span></span>
     <span></span>
     <span></span>
   </div>
   <ul class="nav-links" id="navLinks">
-    <li><a href="/home" onclick="console.log('Home link clicked')">Home</a></li>
-    <li><a href="/about" onclick="console.log('About link clicked')">About</a></li>
-    <li><a href="/contact" onclick="console.log('Contact link clicked')">Contact</a></li>
+    <li><a href="/" onclick="console.log('Home link clicked')">Home</a></li>
     <% if (user) { %>
     <li class="auth-dependent">
       <a href="/begin" onclick="console.log('Begin link clicked')">Begin</a>
@@ -70,6 +68,8 @@
       <a href="/conversations" onclick="console.log('Conversations link clicked')">My Conversations</a>
     </li>
     <% } %>
+    <li><a href="/about" onclick="console.log('About link clicked')">About</a></li>
+    <li><a href="/contact" onclick="console.log('Contact link clicked')">Contact</a></li>
   </ul>
   
   <% if(!user){ %>
@@ -78,11 +78,10 @@
   <div class="user-menu">
     <button class="user-menu-button" id="userMenuBtn" onclick="toggleUserMenu(); return false;">
       <img src="<%= user.photos && user.photos[0] ? user.photos[0].value : '/default-avatar.png' %>" alt="Profile" class="user-avatar" width="32" height="32">
-      <span><%= user.displayName || 'User' %></span>
+      <span><%= user.displayName || 'User' %> <i class="menu-arrow">▼</i></span>
     </button>
     <div class="user-menu-dropdown" id="userMenuDropdown">
       <a href="/account" onclick="console.log('Account link clicked')">My Account</a>
-      <a href="/conversations" onclick="console.log('Conversations link clicked')">My Conversations</a>
       <a href="/logout" onclick="console.log('Logout link clicked')">Logout</a>
     </div>
   </div>

@@ -8,32 +8,34 @@
     <script src="auth.js" defer></script>
   </head>
   <body>
-    <!-- Navigation -->
-    <%- include('partials/nav') %>
+    <div class="content-wrapper">
+      <!-- Navigation -->
+      <%- include('partials/nav') %>
 
-    <!-- Hero Section -->
-    <section class="hero">
-      <div class="content-container">
-        <h1>GuidanceHub</h1>
-        <h3>Your AI Companion for Life's Decisions</h3>
-        <p>Get personalized advice on career, relationships, finance, and more—powered by cutting-edge AI technology.</p>
-       
-       
-        
-    <% if (!user) { %>
-      <a id="begin" href="/login">Let's Begin</a>
-    <% } else { %>
-      <a id="begin" href="/begin">Let's Begin</a>
-    <% } %>
-    
+      <!-- Hero Section -->
+      <section class="hero">
+        <div class="content-container">
+          <h1>GuidanceHub</h1>
+          <h3>Your AI Companion for Life's Decisions</h3>
+          <p>Get personalized advice on career, relationships, finance, and more—powered by cutting-edge AI technology.</p>
+         
+         
+          
+      <% if (!user) { %>
+        <a class="submit-btn" href="/login">Let's Begin</a>
+      <% } else { %>
+        <a class="submit-btn" href="/begin">Let's Begin</a>
+      <% } %>
+      
 
-     
-      </div>
-    </section>
+       
+        </div>
+      </section>
+    </div>
 
     <!-- Footer -->
     <footer>
-      <p>© 2025 GuidanceHub. All rights reserved.</p>
+      <p> 2025 GuidanceHub. All rights reserved.</p>
     </footer>
     <script src="index.js"></script>
   </body>

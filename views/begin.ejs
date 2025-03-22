@@ -5,120 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GuidanceHub - AI-Powered Life Advice</title>
     <link rel="stylesheet" href="/styles.css" />
-    <!-- Removing auth.js which is causing errors -->
-    <!-- <script src="/auth.js" defer></script> -->
-    <!-- Remove old debugging script - use the new begin-page.js instead -->
-    <!-- 
-    <script>
-      console.log('Begin page script executing');
-      document.addEventListener('DOMContentLoaded', () => {
-        console.log('DOM fully loaded and parsed');
-        const initialForm = document.getElementById('initial-form');
-        const questionsForm = document.getElementById('questions-form');
-        const questionsContainer = document.getElementById('questions-container');
-        const adviceContainer = document.getElementById('advice-container');
-        const loadingOverlay = document.getElementById('loading-overlay');
-        const introSection = document.getElementById('intro-section');
-
-        console.log('Initial form:', initialForm);
-        console.log('Questions form:', questionsForm);
-        console.log('Questions container:', questionsContainer);
-        console.log('Advice container:', adviceContainer);
-        console.log('Loading overlay:', loadingOverlay);
-        console.log('Intro section:', introSection);
-
-        // Test a click handler on the debug element
-        const debugInfo = document.createElement('div');
-        debugInfo.style.position = 'fixed';
-        debugInfo.style.top = '10px';
-        debugInfo.style.left = '10px';
-        debugInfo.style.backgroundColor = 'rgba(0,0,0,0.7)';
-        debugInfo.style.color = 'white';
-        debugInfo.style.padding = '10px';
-        debugInfo.style.zIndex = '9999';
-        debugInfo.textContent = 'Debug: Page loaded at ' + new Date().toISOString();
-        document.body.appendChild(debugInfo);
-        
-        debugInfo.addEventListener('click', function() {
-          alert('Debug element clicked - DOM events are working');
-        });
-
-        console.log('Debug element added to the page');
-      });
-    </script>
-    -->
-    <!-- Load our dedicated begin page script -->
     <script src="/begin-page.js" defer></script>
   </head>
   <body>
     <div class="content-wrapper">
-      <!-- Additional styles to ensure form elements are above any overlays -->
-      <style>
-        /* Fix for unresponsive elements */
-        body, html {
-          height: 100%;
-          width: 100%;
-          overflow-x: hidden;
-        }
-        
-        /* Ensure all elements are clickable */
-        .contact {
-          z-index: 10 !important;
-          position: relative !important;
-        }
-        
-        .content-container {
-          z-index: 10 !important;
-          position: relative !important;
-          pointer-events: auto !important;
-        }
-        
-        /* Make sure all form elements can receive clicks */
-        #initial-form, 
-        #questions-form,
-        input, 
-        select, 
-        button, 
-        label, 
-        .choice-container, 
-        .radio-container, 
-        .radio-options {
-          z-index: 100 !important;
-          position: relative !important;
-          pointer-events: auto !important;
-        }
-        
-        /* Specifically target radio buttons */
-        input[type="radio"] {
-          cursor: pointer !important;
-          pointer-events: auto !important;
-          opacity: 1 !important;
-          position: relative !important;
-          z-index: 1000 !important;
-        }
-        
-        /* Remove any hidden overlays */
-        body::before,
-        body::after,
-        .hero::before,
-        .hero::after,
-        .about::before,
-        .about::after,
-        .contact::before,
-        .contact::after {
-          display: none !important;
-          content: none !important;
-        }
-      </style>
-  
       <!-- Navigation -->
       <%- include('partials/nav') %>
 
-     <section class="contact">
+      <section class="contact">
         <div class="content-container">
           <div class="intro-section" id="intro-section">
             <h1>Fill in Information</h1>
-
           </div>
 
           <!-- Initial Form -->
@@ -130,9 +27,8 @@
                 type="text"
                 id="category"
                 name="category"
-                placeholder="Enter the topic "
+                placeholder="Enter the topic"
                 required
-                style="cursor: pointer; z-index: 1001; position: relative; pointer-events: auto;"
               />
             </div>
 
@@ -140,30 +36,29 @@
             <div class="radio-container">
               <p>Choose your preferred advice style:</p>
               <div class="radio-options">
-                <label style="cursor: pointer; z-index: 1001; position: relative; pointer-events: auto; margin-bottom: 10px;">
+                <label>
                   <input
                     type="radio"
                     id="philosophical"
                     name="advice_style"
                     value="philosophical"
                     required
-                    style="cursor: pointer; z-index: 1001; position: relative; pointer-events: auto;"
                   />
                   Philosophical & Deep
                 </label>
                 
-                <label style="cursor: pointer; z-index: 1001; position: relative; pointer-events: auto; margin-bottom: 10px;">
-                  <input type="radio" id="practical" name="advice_style" value="practical" style="cursor: pointer; z-index: 1001; position: relative; pointer-events: auto;" />
+                <label>
+                  <input type="radio" id="practical" name="advice_style" value="practical" />
                   Practical & Actionable
                 </label>
                 
-                <label style="cursor: pointer; z-index: 1001; position: relative; pointer-events: auto; margin-bottom: 10px;">
-                  <input type="radio" id="empathetic" name="advice_style" value="empathetic" style="cursor: pointer; z-index: 1001; position: relative; pointer-events: auto;" />
+                <label>
+                  <input type="radio" id="empathetic" name="advice_style" value="empathetic" />
                   Empathetic & Supportive
                 </label>
                 
-                <label style="cursor: pointer; z-index: 1001; position: relative; pointer-events: auto;">
-                  <input type="radio" id="humorous" name="advice_style" value="humorous" style="cursor: pointer; z-index: 1001; position: relative; pointer-events: auto;" />
+                <label>
+                  <input type="radio" id="humorous" name="advice_style" value="humorous" />
                   Humorous & Light-hearted
                 </label>
               </div>
@@ -172,7 +67,7 @@
             <!-- Mood Selection -->
             <div class="choice-container">
               <label for="mood">Your Current Mood</label>
-              <select id="mood" name="mood" required class="styled-select" style="cursor: pointer; z-index: 1001; position: relative; pointer-events: auto;">
+              <select id="mood" name="mood" required class="styled-select">
                 <option value="" disabled selected>Select your mood</option>
                 <option value="overwhelmed">Overwhelmed</option>
                 <option value="motivated">Motivated</option>
@@ -197,7 +92,6 @@
           <!-- Advice Display -->
           <div id="advice-container" class="advice-container">
             <div id="advice-content" class="advice-content"></div>
-            
             <!-- Add action buttons for after advice is displayed -->
             <div class="advice-actions">
               <button onclick="window.location.reload()" class="submit-btn">Start Over</button>
@@ -218,7 +112,6 @@
       <p> 2025 GuidanceHub. All rights reserved.</p>
     </footer>
 
-    <!-- Add script to hide loading overlay immediately -->
     <script>
       window.addEventListener('DOMContentLoaded', function() {
         // Force hide loading overlay
@@ -226,7 +119,6 @@
         if (loadingOverlay) {
           loadingOverlay.style.display = 'none';
           loadingOverlay.style.opacity = '0';
-          console.log('Loading overlay hidden on page load');
         }
       });
     </script>
@@ -247,9 +139,7 @@
         }
       }
     </script>
-    <!-- Removing index.js since we now have inline implementation -->
-    <!-- <script src="/index.js"></script> -->
-    <!-- Add inline implementation of form submission -->
+
     <script>
       // Fallback implementation in case external scripts don't load properly
       function submitInitialForm(form) {

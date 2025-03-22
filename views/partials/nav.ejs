@@ -1,8 +1,7 @@
-<!-- Inline navigation scripts to ensure they run regardless of auth status -->
+<!-- Navigation functionality -->
 <script>
-  // Navigation functions defined at the top of the file to ensure they're available
+  // Navigation functions
   function toggleNav() {
-    console.log('Nav toggle clicked');
     var navLinks = document.getElementById('navLinks');
     var navToggle = document.getElementById('navToggle');
     if (navLinks) {
@@ -22,7 +21,6 @@
   }
   
   function toggleUserMenu() {
-    console.log('User menu toggle clicked');
     var userMenuDropdown = document.getElementById('userMenuDropdown');
     if (userMenuDropdown) {
       if (userMenuDropdown.style.display === 'block') {
@@ -35,8 +33,6 @@
   
   // Execute when DOM is ready
   document.addEventListener('DOMContentLoaded', function() {
-    console.log('Nav script loaded and running');
-    
     // Make sure click outside menu closes it
     document.addEventListener('click', function(event) {
       var userMenuBtn = document.getElementById('userMenuBtn');
@@ -59,21 +55,21 @@
     <span></span>
   </div>
   <ul class="nav-links" id="navLinks">
-    <li><a href="/" onclick="console.log('Home link clicked')">Home</a></li>
+    <li><a href="/">Home</a></li>
     <% if (user) { %>
     <li class="auth-dependent">
-      <a href="/begin" onclick="console.log('Begin link clicked')">Begin</a>
+      <a href="/begin">Begin</a>
     </li>
     <li class="auth-dependent">
-      <a href="/conversations" onclick="console.log('Conversations link clicked')">My Conversations</a>
+      <a href="/conversations">My Conversations</a>
     </li>
     <% } %>
-    <li><a href="/about" onclick="console.log('About link clicked')">About</a></li>
-    <li><a href="/contact" onclick="console.log('Contact link clicked')">Contact</a></li>
+    <li><a href="/about">About</a></li>
+    <li><a href="/contact">Contact</a></li>
   </ul>
   
   <% if(!user){ %>
-  <a class="login-btn" href="/login" onclick="console.log('Login button clicked')">Login</a>
+  <a class="login-btn" href="/login">Login</a>
   <% } else { %>
   <div class="user-menu">
     <button class="user-menu-button" id="userMenuBtn" onclick="toggleUserMenu(); return false;">
@@ -81,8 +77,8 @@
       <span><%= user.displayName || 'User' %> <i class="menu-arrow">▼</i></span>
     </button>
     <div class="user-menu-dropdown" id="userMenuDropdown">
-      <a href="/account" onclick="console.log('Account link clicked')">My Account</a>
-      <a href="/logout" onclick="console.log('Logout link clicked')">Logout</a>
+      <a href="/account">My Account</a>
+      <a href="/logout">Logout</a>
     </div>
   </div>
   <% } %>

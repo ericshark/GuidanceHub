@@ -1,56 +1,24 @@
 // Independent JavaScript for the begin page
 document.addEventListener('DOMContentLoaded', function() {
-  // Force hide loading overlay
+  // Hide loading overlay
   const loadingOverlay = document.getElementById('loading-overlay');
   if (loadingOverlay) {
     loadingOverlay.style.display = 'none';
     loadingOverlay.style.opacity = '0';
-    loadingOverlay.style.pointerEvents = 'none';
   }
   
   // Setup form elements
   const initialForm = document.getElementById('initial-form');
-  if (initialForm) {
-    initialForm.style.display = 'block';
-    initialForm.style.pointerEvents = 'auto';
-    initialForm.style.position = 'relative';
-    initialForm.style.zIndex = '1000';
-    
-    // Add direct event listener to form
-    initialForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      submitInitialForm(initialForm);
-    });
-    
-    // Ensure all form elements are interactive
-    const formInputs = initialForm.querySelectorAll('input, select, button, label');
-    formInputs.forEach(function(element) {
-      element.style.pointerEvents = 'auto';
-      element.style.cursor = 'pointer';
-      element.style.position = 'relative';
-      element.style.zIndex = '1001';
-    });
-  }
-  
-  // Setup questions form
   const questionsForm = document.getElementById('questions-form');
   const adviceContainer = document.getElementById('advice-container');
   
+  // Setup questions form
   if (questionsForm) {
     questionsForm.style.display = 'none'; // Initially hidden
     
     questionsForm.addEventListener('submit', function(e) {
       e.preventDefault();
       submitQuestionsForm(questionsForm);
-    });
-    
-    // Make form elements interactive
-    const questionInputs = questionsForm.querySelectorAll('input, button');
-    questionInputs.forEach(function(element) {
-      element.style.pointerEvents = 'auto';
-      element.style.cursor = 'pointer';
-      element.style.position = 'relative';
-      element.style.zIndex = '1001';
     });
   }
   
@@ -66,9 +34,17 @@ document.addEventListener('DOMContentLoaded', function() {
       adviceContainer.prepend(adviceContent);
     }
   }
+  
+  // Add event listener to initial form
+  if (initialForm) {
+    initialForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      submitInitialForm(initialForm);
+    });
+  }
 });
 
-// Form submission function (independent implementation)
+// Form submission function
 function submitInitialForm(form) {
   // Get form values
   const category = document.getElementById('category').value;
@@ -85,7 +61,6 @@ function submitInitialForm(form) {
   if (loadingOverlay) {
     loadingOverlay.style.display = 'flex';
     loadingOverlay.style.opacity = '1';
-    loadingOverlay.style.pointerEvents = 'auto';
     loadingOverlay.classList.add('active');
     
     // Update loading text
@@ -134,7 +109,7 @@ function submitInitialForm(form) {
             <div class="choice-container">
               <label for="answer${index}">Question ${index + 1}: ${question}</label>
               <input type="hidden" name="question${index}" value="${question}">
-              <input type="text" id="answer${index}" name="answer${index}" placeholder="Your answer" required>
+              <textarea id="answer${index}" name="answer${index}" placeholder="Your answer" required></textarea>
             </div>
           `;
         });
@@ -149,21 +124,16 @@ function submitInitialForm(form) {
   })
   .catch(error => {
     if (error.message === 'Unauthorized') {
-      const confirmLogin = confirm('You need to log in to get advice. Would you like to log in now?');
-      if (confirmLogin) {
-        window.location.href = '/auth/google';
-      }
+      window.location.href = '/login';
     } else {
       alert('An error occurred: ' + error.message);
     }
   })
   .finally(() => {
     // Hide loading indicator
-    const loadingOverlay = document.getElementById('loading-overlay');
     if (loadingOverlay) {
       loadingOverlay.style.display = 'none';
       loadingOverlay.style.opacity = '0';
-      loadingOverlay.style.pointerEvents = 'none';
       loadingOverlay.classList.remove('active');
     }
   });
@@ -171,7 +141,7 @@ function submitInitialForm(form) {
 
 // Questions form submission function
 function submitQuestionsForm(form) {
-  // Get all data from the form
+  // Get form data
   const formData = new FormData(form);
   const formObject = {};
   
@@ -179,35 +149,23 @@ function submitQuestionsForm(form) {
     formObject[key] = value;
   });
   
-  // Check if all answers are provided
-  for (let i = 0; i < 3; i++) {
-    if (!formObject[`answer${i}`]) {
-      alert('Please answer all questions');
-      return;
-    }
-  }
-  
-  // Show loading indicator with updated text
+  // Show loading indicator
   const loadingOverlay = document.getElementById('loading-overlay');
   if (loadingOverlay) {
     loadingOverlay.style.display = 'flex';
     loadingOverlay.style.opacity = '1';
-    loadingOverlay.style.pointerEvents = 'auto';
-    loadingOverlay.classList.add('active');
     
     // Update loading text
     const loaderText = loadingOverlay.querySelector('.loader-text');
     if (loaderText) {
-      loaderText.textContent = 'Analyzing your answers and crafting the perfect advice...';
+      loaderText.textContent = 'Generating your personalized advice...';
     }
   }
   
-  // Submit data to server
+  // Submit using fetch API
   fetch('/get-advice', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(formObject),
     credentials: 'same-origin'
   })
@@ -216,87 +174,45 @@ function submitQuestionsForm(form) {
       if (response.status === 401) {
         throw new Error('Unauthorized');
       }
-      throw new Error(`Server error: ${response.status}`);
+      throw new Error('Server error');
     }
     return response.json();
   })
-  .then(data => {
-    // Check if there's valid advice data
-    if (!data || !data.advice) {
-      alert('No advice data received from server. Please try again.');
-      return;
-    }
-    
-    // Hide questions form
-    const questionsForm = document.getElementById('questions-form');
-    if (questionsForm) {
-      questionsForm.style.display = 'none';
-    }
-    
-    // Display advice
-    const adviceContainer = document.getElementById('advice-container');
-    
-    if (!adviceContainer) {
-      alert('Could not find advice container element. Please reload the page.');
-      return;
-    }
-    
-    // Get or create the advice content element
-    let adviceContent = document.getElementById('advice-content');
-    if (!adviceContent) {
-      adviceContent = document.createElement('div');
-      adviceContent.id = 'advice-content';
-      adviceContent.className = 'advice-content';
-      adviceContainer.prepend(adviceContent);
-    }
-    
-    try {
-      // Clear any existing content and add new advice
-      adviceContent.innerHTML = '';
+  .then(result => {
+    if (result.advice) {
+      // Handle successful response
+      const questionsForm = document.getElementById('questions-form');
+      const adviceContainer = document.getElementById('advice-container');
+      const adviceContent = document.getElementById('advice-content');
       
-      // Format the advice with proper styling
-      let formattedAdvice = data.advice;
+      if (questionsForm) questionsForm.style.display = 'none';
       
-      // Clean and format advice text
-      formattedAdvice = formattedAdvice.replace(/\n\n/g, '</p><p>');
+      if (adviceContent) {
+        adviceContent.innerHTML = `
+          <h2>Your Personalized Advice</h2>
+          <div class="advice-text">${result.advice}</div>
+        `;
+      }
       
-      // Add header and wrap in paragraph tags
-      formattedAdvice = `<h3>Your Personalized Advice</h3><p>${formattedAdvice}</p>`;
-      
-      // Set the content
-      adviceContent.innerHTML = formattedAdvice;
-      
-      // Make sure adviceContainer is visible and has active class
-      adviceContainer.style.display = 'block';
-      
-      // Use a timeout to allow the browser to render before adding the active class
-      setTimeout(() => {
-        adviceContainer.classList.add('active');
-        // Scroll to the advice
-        adviceContainer.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-    } catch (error) {
-      alert('Error displaying advice: ' + error.message);
+      if (adviceContainer) {
+        adviceContainer.style.display = 'block';
+      }
+    } else {
+      alert('Failed to retrieve advice. Please try again.');
     }
   })
   .catch(error => {
     if (error.message === 'Unauthorized') {
-      const confirmLogin = confirm('You need to log in to get advice. Would you like to log in now?');
-      if (confirmLogin) {
-        window.location.href = '/auth/google';
-      }
+      window.location.href = '/login';
     } else {
       alert('An error occurred: ' + error.message);
     }
   })
   .finally(() => {
     // Hide loading indicator
-    const loadingOverlay = document.getElementById('loading-overlay');
     if (loadingOverlay) {
       loadingOverlay.style.display = 'none';
       loadingOverlay.style.opacity = '0';
-      loadingOverlay.style.pointerEvents = 'none';
-      loadingOverlay.classList.remove('active');
     }
   });
 }

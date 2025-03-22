@@ -35,7 +35,7 @@ app.use(session({
 
 // Passport Configuration
 const callbackURL = process.env.NODE_ENV === 'production' 
-  ? `${process.env.APP_URL || 'https://your-render-app-name.onrender.com'}/auth/google/callback` 
+  ? `${process.env.APP_URL || 'https://pathfinder-krpb.onrender.com'}/auth/google/callback` 
   : 'http://localhost:3000/auth/google/callback';
 console.log('Using callbackURL:', callbackURL);
 

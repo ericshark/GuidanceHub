@@ -1,36 +1,36 @@
 <nav>
   <div class="logo">GuidanceHub</div>
-  <div class="nav-toggle" id="navToggle">
+  <div class="nav-toggle" id="navToggle" onclick="toggleNav()">
     <span></span>
     <span></span>
     <span></span>
   </div>
   <ul class="nav-links" id="navLinks">
-    <li><a href="/home">Home</a></li>
-    <li><a href="/about">About</a></li>
-    <li><a href="/contact">Contact</a></li>
+    <li><a href="/home" onclick="console.log('Home link clicked')">Home</a></li>
+    <li><a href="/about" onclick="console.log('About link clicked')">About</a></li>
+    <li><a href="/contact" onclick="console.log('Contact link clicked')">Contact</a></li>
     <% if (user) { %>
     <li class="auth-dependent">
-      <a href="/begin">Begin</a>
+      <a href="/begin" onclick="console.log('Begin link clicked')">Begin</a>
     </li>
     <li class="auth-dependent">
-      <a href="/conversations">My Conversations</a>
+      <a href="/conversations" onclick="console.log('Conversations link clicked')">My Conversations</a>
     </li>
     <% } %>
   </ul>
   
   <% if(!user){ %>
-  <a class="login-btn" href="/login">Login</a>
+  <a class="login-btn" href="/login" onclick="console.log('Login button clicked')">Login</a>
   <% } else { %>
   <div class="user-menu">
-    <button class="user-menu-button" id="userMenuBtn">
+    <button class="user-menu-button" id="userMenuBtn" onclick="toggleUserMenu()">
       <img src="<%= user.photos && user.photos[0] ? user.photos[0].value : '/default-avatar.png' %>" alt="Profile" class="user-avatar" width="32" height="32">
       <span><%= user.displayName || 'User' %></span>
     </button>
     <div class="user-menu-dropdown" id="userMenuDropdown">
-      <a href="/account">My Account</a>
-      <a href="/conversations">My Conversations</a>
-      <a href="/logout">Logout</a>
+      <a href="/account" onclick="console.log('Account link clicked')">My Account</a>
+      <a href="/conversations" onclick="console.log('Conversations link clicked')">My Conversations</a>
+      <a href="/logout" onclick="console.log('Logout link clicked')">Logout</a>
     </div>
   </div>
   <% } %>
@@ -38,28 +38,30 @@
 
 <script>
   // Toggle mobile menu
-  document.getElementById('navToggle').addEventListener('click', function() {
-    document.getElementById('navLinks').classList.toggle('active');
-    this.classList.toggle('active');
-  });
+  function toggleNav() {
+    console.log('Nav toggle clicked');
+    var navLinks = document.getElementById('navLinks');
+    var navToggle = document.getElementById('navToggle');
+    if (navLinks) navLinks.classList.toggle('active');
+    if (navToggle) navToggle.classList.toggle('active');
+  }
   
   // Toggle user menu dropdown
-  const userMenuBtn = document.getElementById('userMenuBtn');
-  const userMenuDropdown = document.getElementById('userMenuDropdown');
-  
-  if (userMenuBtn && userMenuDropdown) {
-    userMenuBtn.addEventListener('click', function(e) {
-      e.stopPropagation();
+  function toggleUserMenu() {
+    console.log('User menu toggle clicked');
+    var userMenuDropdown = document.getElementById('userMenuDropdown');
+    if (userMenuDropdown) {
       userMenuDropdown.style.display = userMenuDropdown.style.display === 'block' ? 'none' : 'block';
-    });
-    
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function() {
-      if (userMenuDropdown) userMenuDropdown.style.display = 'none';
-    });
-    
-    userMenuDropdown.addEventListener('click', function(e) {
-      e.stopPropagation();
-    });
+    }
   }
+  
+  // Close user dropdown when clicking elsewhere
+  document.addEventListener('click', function(event) {
+    var userMenuBtn = document.getElementById('userMenuBtn');
+    var userMenuDropdown = document.getElementById('userMenuDropdown');
+    
+    if (userMenuBtn && userMenuDropdown && !userMenuBtn.contains(event.target) && !userMenuDropdown.contains(event.target)) {
+      userMenuDropdown.style.display = 'none';
+    }
+  });
 </script>

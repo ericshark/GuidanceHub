@@ -6,6 +6,32 @@
     <title>GuidanceHub - AI-Powered Life Advice</title>
     <link rel="stylesheet" href="/styles.css" />
     <script src="/auth.js" defer></script>
+    <!-- Add inline debugging script -->
+    <script>
+      console.log('Begin page loaded - Inline script executing');
+      
+      // Check if scripts are loading
+      window.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM fully loaded');
+        
+        // Test DOM manipulation directly
+        const debugInfo = document.createElement('div');
+        debugInfo.style.position = 'fixed';
+        debugInfo.style.bottom = '10px';
+        debugInfo.style.right = '10px';
+        debugInfo.style.backgroundColor = 'rgba(0,0,0,0.7)';
+        debugInfo.style.color = 'white';
+        debugInfo.style.padding = '10px';
+        debugInfo.style.zIndex = '9999';
+        debugInfo.textContent = 'Debug: Page loaded at ' + new Date().toISOString();
+        document.body.appendChild(debugInfo);
+        
+        // Test a click handler on the debug element
+        debugInfo.addEventListener('click', function() {
+          alert('Debug element clicked - DOM events are working');
+        });
+      });
+    </script>
   </head>
   <body>
     <!-- Navigation -->
@@ -19,7 +45,7 @@
         </div>
 
         <!-- Initial Form -->
-        <form id="initial-form" class="user-information">
+        <form id="initial-form" class="user-information" onsubmit="event.preventDefault(); console.log('Form submitted via inline handler'); submitInitialForm(this);">
           <!-- Topic Input -->
           <div class="choice-container">
             <label for="category">Advice Topic:</label>
@@ -29,6 +55,7 @@
               name="category"
               placeholder="Enter the topic you want advice on"
               required
+              onclick="console.log('Input field clicked')"
             />
           </div>
 
@@ -42,19 +69,20 @@
                   name="advice_style"
                   value="philosophical"
                   required
+                  onclick="console.log('Radio option clicked')"
                 />
                 Philosophical & Deep
               </label>
               <label>
-                <input type="radio" name="advice_style" value="practical" />
+                <input type="radio" name="advice_style" value="practical" onclick="console.log('Radio option clicked')" />
                 Practical & Actionable
               </label>
               <label>
-                <input type="radio" name="advice_style" value="empathetic" />
+                <input type="radio" name="advice_style" value="empathetic" onclick="console.log('Radio option clicked')" />
                 Empathetic & Supportive
               </label>
               <label>
-                <input type="radio" name="advice_style" value="humorous" />
+                <input type="radio" name="advice_style" value="humorous" onclick="console.log('Radio option clicked')" />
                 Humorous & Light-hearted
               </label>
             </div>
@@ -63,7 +91,7 @@
           <!-- Mood Selection -->
           <div class="choice-container">
             <label for="mood">Current Mood:</label>
-            <select id="mood" name="mood" required>
+            <select id="mood" name="mood" required onclick="console.log('Mood dropdown clicked')">
               <option value="" disabled selected>Select your mood</option>
               <option value="overwhelmed">Overwhelmed</option>
               <option value="motivated">Motivated</option>
@@ -94,7 +122,7 @@
     </div>
     <!-- Footer -->
     <footer>
-      <p>© 2025 GuidanceHub. All rights reserved.</p>
+      <p> 2025 GuidanceHub. All rights reserved.</p>
     </footer>
 
     <script>
@@ -114,5 +142,132 @@
       }
     </script>
     <script src="/index.js"></script>
+    <!-- Add inline implementation of form submission -->
+    <script>
+      // Fallback implementation in case external scripts don't load properly
+      function submitInitialForm(form) {
+        console.log('Submitting form via inline function');
+        
+        // Show debug info
+        const debugInfo = document.createElement('div');
+        debugInfo.style.position = 'fixed';
+        debugInfo.style.top = '10px';
+        debugInfo.style.left = '10px';
+        debugInfo.style.backgroundColor = 'rgba(0,0,0,0.7)';
+        debugInfo.style.color = 'white';
+        debugInfo.style.padding = '10px';
+        debugInfo.style.zIndex = '9999';
+        debugInfo.textContent = 'Processing form submission...';
+        document.body.appendChild(debugInfo);
+        
+        // Get form values
+        const category = document.getElementById('category').value;
+        const advice_style = document.querySelector('input[name="advice_style"]:checked')?.value;
+        const mood = document.getElementById('mood').value;
+        
+        if (!category || !advice_style || !mood) {
+          alert('Please fill in all required fields');
+          debugInfo.textContent = 'Error: Missing required fields';
+          return;
+        }
+        
+        debugInfo.textContent = `Submitting: ${category}, ${advice_style}, ${mood}`;
+        
+        // Show loading indicator
+        const loadingOverlay = document.getElementById('loading-overlay');
+        if (loadingOverlay) {
+          loadingOverlay.style.display = 'flex';
+        }
+        
+        // Manually submit using fetch API
+        fetch('/get-questions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ category, advice_style, mood }),
+        })
+        .then(response => {
+          debugInfo.textContent += ' | Response received';
+          if (!response.ok) {
+            if (response.status === 401) {
+              throw new Error('Unauthorized');
+            }
+            throw new Error('Server error');
+          }
+          return response.json();
+        })
+        .then(result => {
+          debugInfo.textContent += ' | Processing data';
+          if (result.questions && result.questions.length === 3) {
+            // Handle successful response
+            const introSection = document.getElementById('intro-section');
+            const initialForm = document.getElementById('initial-form');
+            const questionsForm = document.getElementById('questions-form');
+            const questionsContainer = document.getElementById('questions-container');
+            
+            if (introSection) introSection.style.display = 'none';
+            if (initialForm) initialForm.style.display = 'none';
+            
+            if (questionsContainer) {
+              questionsContainer.innerHTML = `
+                <input type="hidden" name="category" value="${category}">
+                <input type="hidden" name="advice_style" value="${advice_style}">
+                <input type="hidden" name="mood" value="${mood}">
+              `;
+              
+              result.questions.forEach((question, index) => {
+                questionsContainer.innerHTML += `
+                  <div class="choice-container">
+                    <label for="answer${index}">Question ${index + 1}: ${question}</label>
+                    <input type="hidden" name="question${index}" value="${question}">
+                    <input type="text" id="answer${index}" name="answer${index}" placeholder="Your answer" required>
+                  </div>
+                `;
+              });
+            }
+            
+            if (questionsForm) {
+              questionsForm.style.display = 'block';
+              debugInfo.textContent = 'Questions loaded successfully';
+            }
+          } else {
+            alert('Failed to retrieve questions. Please try again.');
+            debugInfo.textContent = 'Error: Invalid question data';
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          if (error.message === 'Unauthorized') {
+            const confirmLogin = confirm('You need to log in to get advice. Would you like to log in now?');
+            if (confirmLogin) {
+              window.location.href = '/auth/google';
+            }
+          } else {
+            alert('An error occurred: ' + error.message);
+          }
+          debugInfo.textContent = `Error: ${error.message}`;
+        })
+        .finally(() => {
+          // Hide loading indicator
+          const loadingOverlay = document.getElementById('loading-overlay');
+          if (loadingOverlay) {
+            loadingOverlay.style.display = 'none';
+          }
+        });
+      }
+      
+      // Add event listeners for questions form as well
+      document.addEventListener('DOMContentLoaded', function() {
+        const questionsForm = document.getElementById('questions-form');
+        if (questionsForm) {
+          questionsForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('Questions form submitted');
+            
+            // Similar implementation for questionsForm submission
+            // You can expand this if needed
+          });
+        }
+      });
+    </script>
   </body>
 </html>

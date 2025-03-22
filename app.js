@@ -81,7 +81,35 @@ app.use((req, res, next) => {
   res.locals.isAuthenticated = req.isAuthenticated();
   next();
 });
-app.use(express.static('public'));
+
+// Debug middleware for static file requests
+app.use((req, res, next) => {
+  if (req.path.startsWith('/auth.js') || req.path.startsWith('/index.js') || req.path.startsWith('/styles.css')) {
+    console.log(`Static resource requested: ${req.path}`);
+  }
+  next();
+});
+
+// Improved static file serving with proper headers for production
+app.use(express.static('public', {
+  // Set Cache-Control headers
+  maxAge: process.env.NODE_ENV === 'production' ? '1h' : 0,
+  // Set proper content types
+  setHeaders: (res, path) => {
+    if (path.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript; charset=UTF-8');
+    } else if (path.endsWith('.css')) {
+      res.setHeader('Content-Type', 'text/css; charset=UTF-8');
+    }
+    
+    // Add CORS headers in production
+    if (process.env.NODE_ENV === 'production') {
+      // Allow same-origin and the render.com domain
+      res.setHeader('Access-Control-Allow-Origin', '*');
+    }
+  }
+}));
+
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

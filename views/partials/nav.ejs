@@ -1,6 +1,59 @@
+<!-- Inline navigation scripts to ensure they run regardless of auth status -->
+<script>
+  // Navigation functions defined at the top of the file to ensure they're available
+  function toggleNav() {
+    console.log('Nav toggle clicked');
+    var navLinks = document.getElementById('navLinks');
+    var navToggle = document.getElementById('navToggle');
+    if (navLinks) {
+      if (navLinks.classList.contains('active')) {
+        navLinks.classList.remove('active');
+      } else {
+        navLinks.classList.add('active');
+      }
+    }
+    if (navToggle) {
+      if (navToggle.classList.contains('active')) {
+        navToggle.classList.remove('active');
+      } else {
+        navToggle.classList.add('active');
+      }
+    }
+  }
+  
+  function toggleUserMenu() {
+    console.log('User menu toggle clicked');
+    var userMenuDropdown = document.getElementById('userMenuDropdown');
+    if (userMenuDropdown) {
+      if (userMenuDropdown.style.display === 'block') {
+        userMenuDropdown.style.display = 'none';
+      } else {
+        userMenuDropdown.style.display = 'block';
+      }
+    }
+  }
+  
+  // Execute when DOM is ready
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('Nav script loaded and running');
+    
+    // Make sure click outside menu closes it
+    document.addEventListener('click', function(event) {
+      var userMenuBtn = document.getElementById('userMenuBtn');
+      var userMenuDropdown = document.getElementById('userMenuDropdown');
+      
+      if (userMenuBtn && userMenuDropdown && 
+          !userMenuBtn.contains(event.target) && 
+          !userMenuDropdown.contains(event.target)) {
+        userMenuDropdown.style.display = 'none';
+      }
+    });
+  });
+</script>
+
 <nav>
   <div class="logo">GuidanceHub</div>
-  <div class="nav-toggle" id="navToggle" onclick="toggleNav()">
+  <div class="nav-toggle" id="navToggle" onclick="toggleNav(); return false;">
     <span></span>
     <span></span>
     <span></span>
@@ -23,7 +76,7 @@
   <a class="login-btn" href="/login" onclick="console.log('Login button clicked')">Login</a>
   <% } else { %>
   <div class="user-menu">
-    <button class="user-menu-button" id="userMenuBtn" onclick="toggleUserMenu()">
+    <button class="user-menu-button" id="userMenuBtn" onclick="toggleUserMenu(); return false;">
       <img src="<%= user.photos && user.photos[0] ? user.photos[0].value : '/default-avatar.png' %>" alt="Profile" class="user-avatar" width="32" height="32">
       <span><%= user.displayName || 'User' %></span>
     </button>
@@ -35,33 +88,3 @@
   </div>
   <% } %>
 </nav>
-
-<script>
-  // Toggle mobile menu
-  function toggleNav() {
-    console.log('Nav toggle clicked');
-    var navLinks = document.getElementById('navLinks');
-    var navToggle = document.getElementById('navToggle');
-    if (navLinks) navLinks.classList.toggle('active');
-    if (navToggle) navToggle.classList.toggle('active');
-  }
-  
-  // Toggle user menu dropdown
-  function toggleUserMenu() {
-    console.log('User menu toggle clicked');
-    var userMenuDropdown = document.getElementById('userMenuDropdown');
-    if (userMenuDropdown) {
-      userMenuDropdown.style.display = userMenuDropdown.style.display === 'block' ? 'none' : 'block';
-    }
-  }
-  
-  // Close user dropdown when clicking elsewhere
-  document.addEventListener('click', function(event) {
-    var userMenuBtn = document.getElementById('userMenuBtn');
-    var userMenuDropdown = document.getElementById('userMenuDropdown');
-    
-    if (userMenuBtn && userMenuDropdown && !userMenuBtn.contains(event.target) && !userMenuDropdown.contains(event.target)) {
-      userMenuDropdown.style.display = 'none';
-    }
-  });
-</script>

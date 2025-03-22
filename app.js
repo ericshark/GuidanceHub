@@ -12,6 +12,12 @@ const MongoStore = require('connect-mongo'); // Added import
 // Set view engine
 app.set('view engine', 'ejs');
 
+// Trust proxy when in production (important for cookies when behind a proxy)
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+  console.log('Trusting proxy in production environment');
+}
+
 // Connect to MongoDB
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/guidancehub';
 mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -29,6 +35,7 @@ app.use(session({
   }),
   cookie: {
     secure: process.env.NODE_ENV === 'production', // Set to true in production with HTTPS
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // Important for cross-site cookies in production
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
 }));
@@ -45,14 +52,24 @@ passport.use(new GoogleStrategy({
   callbackURL: callbackURL
 }, (accessToken, refreshToken, profile, done) => {
   console.log('Google OAuth profile:', profile);
-  return done(null, profile);
+  // Store more user information for better persistence
+  const user = {
+    id: profile.id,
+    displayName: profile.displayName,
+    emails: profile.emails,
+    photos: profile.photos,
+    provider: profile.provider
+  };
+  return done(null, user);
 }));
 
 passport.serializeUser((user, done) => {
+  console.log('Serializing user:', user.id);
   done(null, user);
 });
 
 passport.deserializeUser((user, done) => {
+  console.log('Deserializing user:', user.id);
   done(null, user);
 });
 
@@ -107,6 +124,7 @@ const ensureAuthenticatedApi = (req, res, next) => {
 // Authentication Routes
 app.get('/auth/google',
   (req, res, next) => {
+    console.log('Starting Google auth, referrer:', req.headers.referer);
     req.session.returnTo = req.headers.referer || '/'; // Save the original URL
     next();
   },
@@ -118,7 +136,18 @@ app.get('/auth/google/callback',
   (req, res) => {
     const redirectUrl = req.session.returnTo || '/';
     delete req.session.returnTo; // Clear the saved URL
-    res.redirect(redirectUrl);
+    
+    console.log('Auth successful, user:', req.user?.id);
+    console.log('Session after auth:', req.session);
+    console.log('Redirecting to:', redirectUrl);
+    
+    // Save session before redirecting
+    req.session.save((err) => {
+      if (err) {
+        console.error('Error saving session:', err);
+      }
+      res.redirect(redirectUrl);
+    });
   }
 );
 

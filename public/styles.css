@@ -301,7 +301,7 @@ nav {
 
 /* Make question inputs wider */
 .choice-container textarea {
-  width: 10%;
+  width: 90%;
   resize: vertical;
   min-height: 100px;
 }

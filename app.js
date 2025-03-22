@@ -28,13 +28,15 @@ app.use(session({
     collectionName: 'sessions'
   }),
   cookie: {
-    secure: false, // Set to true only in production with HTTPS
+    secure: process.env.NODE_ENV === 'production', // Set to true in production with HTTPS
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
 }));
 
 // Passport Configuration
-const callbackURL = 'http://localhost:3000/auth/google/callback';
+const callbackURL = process.env.NODE_ENV === 'production' 
+  ? `${process.env.APP_URL || 'https://your-render-app-name.onrender.com'}/auth/google/callback` 
+  : 'http://localhost:3000/auth/google/callback';
 console.log('Using callbackURL:', callbackURL);
 
 passport.use(new GoogleStrategy({

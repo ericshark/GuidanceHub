@@ -6,7 +6,8 @@
 
 GuidanceHub is an AI-powered platform that provides personalized advice on a variety of life topics. Users can receive tailored guidance based on their specific situations, preferences, and emotional states.
 
-![GuidanceHub Screenshot](https://placeholder-for-screenshot.png)
+![image](https://github.com/user-attachments/assets/ed31ebb3-cf03-4311-9205-2f751521276e)
+
 
 ## ✨ Features
 

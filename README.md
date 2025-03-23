@@ -29,8 +29,8 @@ GuidanceHub is an AI-powered platform that provides personalized advice on a var
 
 ### Prerequisites
 
-- Node.js (v14 or later)
-- MongoDB (local or Atlas)
+- Node.js (v14)
+- MongoDB (Atlas)
 - Google OAuth credentials
 
 ### Installation

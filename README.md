@@ -8,6 +8,11 @@ GuidanceHub is an AI-powered platform that provides personalized advice on a var
 
 ![image](https://github.com/user-attachments/assets/ed31ebb3-cf03-4311-9205-2f751521276e)
 
+## 🌐 Live Demo
+
+**🔗 [Live Here](https://pathfinder-krpb.onrender.com/)**  
+Experience the project in action!
+
 
 ## ✨ Features
 
